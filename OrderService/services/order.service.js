@@ -17,6 +17,7 @@ module.exports = {
 	mixins: [DbService],
 	adapter: new MongooseAdapter("mongodb://localhost:27017/mydatabase"),
 	model: OrderModel,
+	// collection: "orders",
 	/**
 	 * Settings
 	 */
@@ -52,6 +53,8 @@ module.exports = {
 			/** @param {Context} ctx  */
 			async handler(ctx) {
 				console.log(ctx, "=====ctx111111");
+				const productInfo = await ctx.call("product.getDetail", ctx)
+				console.log(productInfo, "=====productInfo99999999");
 				const orderInfo = await OrderModel.findOne({
 					orderId: ctx.params.orderId,
 				});
@@ -94,12 +97,13 @@ module.exports = {
 			async handler(ctx) {
 				try {
 					const [orderCreated] = await ctx.emit("order.created", ctx);
+					console.log(orderCreated,"=====orderCreated")
 					return orderCreated;
 				} catch (error) {
 					throw new Error(error);
 				}
 			},
-		},
+		}
 	},
 
 	/**

@@ -1,7 +1,7 @@
 const middlewares1 = async (ctx, next) => {
     try {
         console.log(ctx, "=====ctx");
-        ctx.params.test = "test"
+        ctx.params.productId = 1
         await next(); // Proceed with the next middleware or handler
     } catch (error) {
         ctx.status = error.status || 500;

@@ -77,7 +77,6 @@ module.exports = {
 				quantity: { type: "number", optional: true },
 			},
 			async handler(ctx) {
-				console.log(ctx, "=====ctx2222222");
 				let { id, name, price, description, quantity } = ctx.params;
 				// Explicitly convert id to a number
 				id = Number(id);
@@ -141,7 +140,6 @@ module.exports = {
 				const productDetails = ctx.params.productDetails;
 				try {
 					const res = await pool.query("SELECT * FROM products");
-					console.log(res.rows); // Hiển thị kết quả truy vấn
 					const allProductsExist = productDetails.every((detail) =>
 						res.rows.some(
 							(row) => row.id.toString() === detail.productId
@@ -248,17 +246,52 @@ module.exports = {
 				});
 			},
 		},
+		getDetail: {
+			async handler(ctx) {
+				try {
+					const [productInfo] = await ctx.emit("product.getDetail", ctx);
+					console.log(productInfo, "=====productInfo98989898");
+					return productInfo;
+				} catch (error) {
+					throw new Error(error);
+				}
+			},
+		},
 	},
 
 	/**
 	 * Events
 	 */
-	events: {},
+	events: {
+		"product.getDetail": {
+			async handler(payload) {
+				console.log(payload, "=====payload0000000");
+				const { productId } = payload.params.params;
+				const product = await this.getProductDetails(productId);
+				return product;
+			},
+		},
+	},
 
 	/**
 	 * Methods
 	 */
-	methods: {},
+	methods: {
+		async getProductDetails(id) {
+			try {
+				console.log(id, "=====id00000000");
+				const product = await Product.findOne({
+					where: { id },
+					raw: true,
+				});
+				console.log(product, "======product");
+				return product;
+			} catch (err) {
+				this.logger.error("Error getting product details", err);
+				return null;
+			}
+		},
+	},
 
 	/**
 	 * Service created lifecycle event handler
